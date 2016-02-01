@@ -5,13 +5,14 @@
 
 // need an admin page so that the sub modules have a place to live. 
 
-function social_mediator_menu()
-{
-  $menu['admin/social'] = array
-  (
+function social_mediator_menu() {
+  $menu['admin/social'] = array (
     'title' => 'Social Mediator',
-    'page callback' => '_social_mediator_admin_page',
+    'description' => 'Provide API keys to authenticate with Twitter and Instagram',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('_social_mediator_admin_page'),
     'access callback' => TRUE,
+    'access arguments' => array('access administration pages'),
   );
   return $menu;
 }
@@ -19,18 +20,17 @@ function social_mediator_menu()
 // set up global social_mediator permissions.
 
 
-function _social_mediator_admin_page() {
-//  $content = array('Here is the admin landing page for the global social mediator.');
+function _social_mediator_admin_page($form, &$form_state) {
+  //$content = array('Here is the admin landing page for the global social mediator.');
 
-//  $output = '';
-//  foreach($content as $c)
-//  {
-//    $output .= '<p>' . $c . '</p>';
-//  }
-//  return $output;
+  //$output = '';
+  //foreach($content as $c)
+  //{
+  //  $output .= '<p>' . $c . '</p>';
+  //}
+  //return $output;
 
-$form = array();
-
+  $form = array();
 
   $form['consumer_key'] = array(
     '#type' => 'text',
@@ -56,14 +56,13 @@ $form = array();
     '#description' => t('Enter your OAuth Access Secret Token'),
   );
 
-  return system_settings_form($form);
 
+  return system_settings_form($form);
 }
 
 // need _function to handle import. This will happen on any imports.
 
-function _social_mediator_import()
-{
+function _social_mediator_import() {
   module_invoke_all('social_mediator_import', $content);
 
   

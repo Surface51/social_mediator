@@ -4,4 +4,3 @@ core = 7.x
 version = "7.x-1.0-alpha"
 package = Surface 51
 
-configure = admin/social-mediator
