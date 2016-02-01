@@ -5,6 +5,8 @@
 
 // need an admin page so that the sub modules have a place to live. 
 
+// set up global social_mediator permissions. 
+
 // need _function to handle import.
 
 // need hook_cron so that imports happen on cron.
