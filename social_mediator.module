@@ -6,61 +6,60 @@
 // need an admin page so that the sub modules have a place to live. 
 
 function social_mediator_menu() {
-  $menu['admin/social'] = array (
+  $items = array();
+
+  $items['admin/social'] = array (
     'title' => 'Social Mediator',
     'description' => 'Provide API keys to authenticate with Twitter and Instagram',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('_social_mediator_admin_page'),
     'access callback' => TRUE,
-    'access arguments' => array('access administration pages'),
   );
-  $menu['admin/social/importall'] = array
-  (
+
+  $items['admin/social/importall'] = array (
     'title' => 'Social Mediator',
     'page callback' => '_social_mediator_import',
     'access callback' => TRUE,
   );
-  return $menu;
+  return $items;
 }
 
 // set up global social_mediator permissions.
 
 
 function _social_mediator_admin_page($form, &$form_state) {
-  //$content = array('Here is the admin landing page for the global social mediator.');
-  //$output = '';
-  //foreach($content as $c)
-  //{
-  //  $output .= '<p>' . $c . '</p>';
-  //}
-  //return $output;
+  $content = array('Here is the admin landing page for the global social mediator.');
+  $output = '';
+  foreach($content as $c) {
+    $output .= '<p>' . $c . '</p>';
+  }
+  return $output;
 
   $form = array();
 
-  $form['consumer_key'] = array(
-    '#type' => 'text',
-    '#title' => t('Consumer Key'),
-    '#description' => t('Enter your Consumer Key'),
-  );
+ //  $form['consumer_key'] = array(
+ //    '#type' => 'text',
+ //    '#title' => t('Consumer Key'),
+ //    '#description' => t('Enter your Consumer Key'),
+ //  );
 
-  $form['consumer_secret'] = array(
-    '#type' => 'text',
-    '#title' => t('Secret Key'),
-    '#description' => t('Enter your Secret Key'),
-  );
+ //  $form['consumer_secret'] = array(
+ //    '#type' => 'text',
+ //    '#title' => t('Secret Key'),
+ //    '#description' => t('Enter your Secret Key'),
+ //  );
 
- $form['oauth_access_token'] = array(
-    '#type' => 'text',
-    '#title' => t('OAuth Access Token'),
-    '#description' => t('Enter your OAuth Access Token'),
-  );
+ // $form['oauth_access_token'] = array(
+ //    '#type' => 'text',
+ //    '#title' => t('OAuth Access Token'),
+ //    '#description' => t('Enter your OAuth Access Token'),
+ //  );
 
-  $form['oauth_access_token_secret'] = array(
-    '#type' => 'text',
-    '#title' => t('OAuth Access Token'),
-    '#description' => t('Enter your OAuth Access Secret Token'),
-  );
-
+ //  $form['oauth_access_token_secret'] = array(
+ //    '#type' => 'text',
+ //    '#title' => t('OAuth Access Token'),
+ //    '#description' => t('Enter your OAuth Access Secret Token'),
+ //  );
 
   return system_settings_form($form);
 }
