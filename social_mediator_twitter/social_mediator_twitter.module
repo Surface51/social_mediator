@@ -3,8 +3,34 @@
 // This is the  twitter specific social_mediator sub-module. Everything in this module should be specific to handling twitter.
 // There should be nothing in this module that would be shared with the facebook module. 
 
+function social_mediator_twitter_menu()
+{
+  $menu['admin/social/twitter'] = array
+  (
+    'title' => 'Social Mediator - Twitter',
+    'page callback' => '_social_mediator_twitter_admin_page',
+    'access callback' => TRUE,
+  );
+  return $menu;
+}
+
 // need a tab in the social_mediator subtheme for twitter. 
+function _social_mediator_twitter_admin_page() {
+  $content = array('Here is the twitter landing page.');
+
+  $output = '';
+  foreach($content as $c)
+  {
+    $output .= '<p>' . $c . '</p>';
+  }
+  return $output;
+}
+
 
 // need _function to handle twitter import.
+// since it's using a hook of the global module, just keep twitter important stuff.
+function social_mediator_twitter_social_mediator_import() {
+
+}
 
 // need hook_cron so that imports happen on cron.
