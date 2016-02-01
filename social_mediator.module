@@ -14,6 +14,12 @@ function social_mediator_menu() {
     'access callback' => TRUE,
     'access arguments' => array('access administration pages'),
   );
+  $menu['admin/social/importall'] = array
+  (
+    'title' => 'Social Mediator',
+    'page callback' => '_social_mediator_import',
+    'access callback' => TRUE,
+  );
   return $menu;
 }
 
@@ -22,7 +28,6 @@ function social_mediator_menu() {
 
 function _social_mediator_admin_page($form, &$form_state) {
   //$content = array('Here is the admin landing page for the global social mediator.');
-
   //$output = '';
   //foreach($content as $c)
   //{
@@ -62,10 +67,24 @@ function _social_mediator_admin_page($form, &$form_state) {
 
 // need _function to handle import. This will happen on any imports.
 
-function _social_mediator_import() {
-  module_invoke_all('social_mediator_import', $content);
+function _social_mediator_import()
+{
+  $content = array();
 
-  
+  if (sizeof(module_implements('social_mediator_import')) > 0) {
+  	$content = module_invoke_all('social_mediator_import', $content);
+  } else {
+  	$content = array("There are no submodules installed.");
+  }
+
+  dsm($content);
+
+  $output = '';
+  foreach($content as $c)
+  {
+    $output .= '<p>' . $c . '</p>';
+  }
+  return $output;
 }
 
 // need hook_cron so that imports happen on cron.
