@@ -1,0 +1,10 @@
+<?php
+
+// This is the global social_mediator module. Information that's specific to a individual social network should not be inside this file. 
+// This module is shared amongst all the subthemes. 
+
+// need an admin page so that the sub modules have a place to live. 
+
+// need _function to handle import.
+
+// need hook_cron so that imports happen on cron.

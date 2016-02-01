@@ -1,0 +1,10 @@
+<?php
+
+// This is the  twitter specific social_mediator sub-module. Everything in this module should be specific to handling twitter.
+// There should be nothing in this module that would be shared with the facebook module. 
+
+// need a tab in the social_mediator subtheme for twitter. 
+
+// need _function to handle twitter import.
+
+// need hook_cron so that imports happen on cron.

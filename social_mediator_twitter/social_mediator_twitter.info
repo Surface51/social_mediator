@@ -1,0 +1,6 @@
+name = Social Mediator Twitter
+description = Handles the importing of tweets for the Social Mediator module.
+core = 7.x
+dependencies[] = social_mediator
+version = "7.x-1.0-alpha"
+package = Surface 51

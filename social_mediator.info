@@ -1,0 +1,5 @@
+name = Social Mediator
+description = Imports various posts to social media as nodes, to be used in views and blocks.
+core = 7.x
+version = "7.x-1.0-alpha"
+package = Surface 51

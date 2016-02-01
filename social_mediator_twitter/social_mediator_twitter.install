@@ -1,0 +1,24 @@
+<?php
+/**
+ * @file
+ * install, and uninstall functions
+ * 
+ * The entity base table is defined here.
+ */
+
+/**
+ * Implements hook_install().
+ */
+
+function social_mediator_twitter_install() {
+    $t = get_t();
+  
+  	
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function social_mediator_twitter_uninstall() {
+  
+}
