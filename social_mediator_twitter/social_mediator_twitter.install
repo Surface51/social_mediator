@@ -12,13 +12,94 @@
 
 function social_mediator_twitter_install() {
     $t = get_t();
-  
   	
+  	$tweet = array(
+		'type' => "sm_tweet",
+		'name' => $t('Social Mediator Tweet'),
+		'description' => $t('Tweets imported by Social Mediator'),
+		'title_label' => $t('Title'),
+		'base' => 'node_content',
+		'custom' => TRUE,
+	);
+
+	node_type_save(node_type_set_defaults($tweet));
+
+	$fields = array();
+
+	$fields['tweet_content'] = array(
+		'field_name' => 'tweet_content',
+		'type' => 'text',
+		'settings' => array(
+		'max_length' => 255,
+		),
+	);
+
+	$fields['twitter_user'] = array(
+		'field_name' => 'twitter_user',
+		'type' => 'text',
+		'settings' => array(
+		'max_length' => 255,
+		),
+	);
+
+	$fields['tweet_id'] = array(
+		'field_name' => 'tweet_id',
+		'type' => 'text',
+		'settings' => array(
+		'max_length' => 255,
+		),
+	);
+
+	foreach ($fields as $field) {
+		field_create_field($field);
+	}
+
+	// Create field instances.
+	$instances = array();
+  	
+	$instances['tweet_content'] = array(
+		'field_name' => 'tweet_content',
+		'label' => $t('Tweet'),
+		'description' => $t('The body of the tweet'),
+		'widget' => array(
+			'type' => 'text_textfield',
+		),
+		'required' => FALSE,
+		'bundle' => 'sm_tweet'
+	);
+
+	$instances['twitter_user'] = array(
+		'field_name' => 'twitter_user',
+		'label' => $t('Twitter User'),
+		'description' => $t('Twitter User'),
+		'widget' => array(
+			'type' => 'text_textfield',
+		),
+		'required' => FALSE,
+		'bundle' => 'sm_tweet'
+	);
+
+	$instances['tweet_id'] = array(
+		'field_name' => 'tweet_id',
+		'label' => $t('Tweet ID'),
+		'description' => $t('Tweet ID'),
+		'widget' => array(
+			'type' => 'text_textfield',
+		),
+		'required' => FALSE,
+		'bundle' => 'sm_tweet'
+	);
+
+	foreach ($instances as $instance) {
+		$instance['entity_type'] = 'node';
+		field_create_instance($instance);
+	}
+
 }
 
 /**
  * Implements hook_uninstall().
  */
 function social_mediator_twitter_uninstall() {
-  
+  node_type_delete("sm_tweet");
 }

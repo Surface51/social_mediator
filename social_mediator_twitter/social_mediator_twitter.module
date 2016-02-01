@@ -11,6 +11,7 @@ function social_mediator_twitter_menu()
     'page callback' => '_social_mediator_twitter_admin_page',
     'access callback' => TRUE,
   );
+
   return $menu;
 }
 
@@ -19,18 +20,95 @@ function _social_mediator_twitter_admin_page() {
   $content = array('Here is the twitter landing page.');
 
   $output = '';
-  foreach($content as $c)
-  {
-    $output .= '<p>' . $c . '</p>';
-  }
   return $output;
 }
 
 
 // need _function to handle twitter import.
 // since it's using a hook of the global module, just keep twitter important stuff.
-function social_mediator_twitter_social_mediator_import() {
+function social_mediator_twitter_social_mediator_import($content) {
+  $content[] = 'Twitter submodule activated.';
+  $content[] = "Importing Tweets";
 
+  require_once ('class/TwitterAPIExchange.php');
+
+	/** Set access tokens here - see: https://dev.twitter.com/apps/ **/
+	$settings = array(
+	    'oauth_access_token' => "15039702-BMaMXAOFOaxlqjk2Ly0rnSGRDAwTwlNzDaC9TBaqt",
+	    'oauth_access_token_secret' => "P2XFlcj5X2fr1CaPfiQptlQyX3Vo6dKbLjAA2pORm2YIw",
+	    'consumer_key' => "dVuGGKxkYJGHAcbHg5Q6wz12g",
+	    'consumer_secret' => "lWHmdTCXQavywXb2odDJCySG4YuYh9lwaw360uTe8YDm3K4jXA"
+	);
+
+	/** Perform a GET request and echo the response **/
+	/** Note: Set the GET field BEFORE calling buildOauth(); **/
+	$url = 'https://api.twitter.com/1.1/statuses/user_timeline.json';
+	$getfield = '?screen_name=goodthingz&count=10&exclude_replies=true';
+	$requestMethod = 'GET';
+	$twitter = new TwitterAPIExchange($settings);
+	$results = $twitter->setGetfield($getfield)
+	             ->buildOauth($url, $requestMethod)
+	             ->performRequest();
+
+	$results = json_decode($results);
+
+	$count = 0;
+
+	foreach ($results as $result) {
+		$object = array();
+		$object['tweet_content'] = $result->text;
+		$object['tweet_id'] = $result->id_str;
+		if (isset($result->retweeted_status)) {
+			$object['twitter_user'] = $result->retweeted_status->user->name ." (@". $result->retweeted_status->user->screen_name .")";
+		} else {
+			$object['twitter_user'] = $result->user->name ." (@". $result->user->screen_name .")";
+		}
+		$object['tweet_date'] = date('m/d/Y H:i:s', strtotime($result->created_at));
+
+
+		if (!_social_mediator_twitter_find_node($object['tweet_id'])) {
+			_social_mediator_twitter_create_node($object);
+			$content[] = "Tweet: " . $object['tweet_content'];
+			$count++;
+		}
+	}
+
+
+  return $content;
 }
+
+function _social_mediator_twitter_find_node($id) {
+	$query = new EntityFieldQuery();
+
+	$query->entityCondition('entity_type', 'node')
+	->entityCondition('bundle', 'sm_tweet')
+	->fieldCondition('tweet_id', 'value', $id, '=')
+	->addMetaData('account', user_load(1));
+
+	$result = $query->execute();
+
+	if (sizeof($result) == 0) {
+		return false;
+	} else {
+		return true;
+	}
+}	
+
+function _social_mediator_twitter_create_node($object) {
+	$node = new StdClass();
+
+	$node->type = 'sm_tweet';
+	node_object_prepare($node);
+
+	$node->title = $object['tweet_content'];
+
+	//$node->tweet_date['und'][0]['value'] = date('Y-m-d H:i:s', strtotime($object['tweet_date']));
+	$node->twitter_user['und'][0]['value'] = $object['twitter_user'];
+	$node->tweet_content['und'][0]['value'] = $object['tweet_content'];
+	$node->tweet_id['und'][0]['value'] = $object['tweet_id'];
+
+	node_save($node);
+}
+
 
 // need hook_cron so that imports happen on cron.
