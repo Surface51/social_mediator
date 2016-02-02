@@ -33,28 +33,32 @@ function _social_mediator_admin_page($form, &$form_state) {
 
   $form = array();
 
-  $form['consumer_key'] = array(
+  $form['sm_twitter_consumer_key'] = array(
     '#type' => 'textfield',
     '#title' => 'Consumer Key',
     '#description' => t('Enter your Consumer Key'),
+    '#default_value' => variable_get("sm_twitter_consumer_key", "")
   );
 
-  $form['consumer_secret'] = array(
+  $form['sm_twitter_consumer_secret'] = array(
     '#type' => 'textfield',
     '#title' => t('Secret Key'),
     '#description' => t('Enter your Secret Key'),
-  );
+    '#default_value' => variable_get("sm_twitter_consumer_secret", "")
+ );
 
- $form['oauth_access_token'] = array(
+ $form['sm_oauth_access_token'] = array(
     '#type' => 'textfield',
     '#title' => t('OAuth Access Token'),
     '#description' => t('Enter your OAuth Access Token'),
+    '#default_value' => variable_get("sm_oauth_access_token", "")
   );
 
-  $form['oauth_access_token_secret'] = array(
+  $form['sm_oauth_access_token_secret'] = array(
     '#type' => 'textfield',
     '#title' => t('OAuth Access Token'),
     '#description' => t('Enter your OAuth Access Secret Token'),
+    '#default_value' => variable_get("sm_oauth_access_token_secret", "")
   );
 
   return system_settings_form($form);
