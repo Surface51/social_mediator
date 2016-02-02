@@ -27,7 +27,7 @@ function social_mediator_menu() {
 // set up global social_mediator permissions.
 
 
-function _social_mediator_admin_page($form, &$form_state) {
+function _social_mediator_admin_page() {
   $content = array('Here is the admin landing page for the global social mediator.');
   $output = '';
   foreach($content as $c) {
@@ -35,7 +35,7 @@ function _social_mediator_admin_page($form, &$form_state) {
   }
   return $output;
 
-  $form = array();
+ // $form = array();
 
  //  $form['consumer_key'] = array(
  //    '#type' => 'text',
@@ -61,7 +61,7 @@ function _social_mediator_admin_page($form, &$form_state) {
  //    '#description' => t('Enter your OAuth Access Secret Token'),
  //  );
 
-  return system_settings_form($form);
+  //return system_settings_form($form);
 }
 
 // need _function to handle import. This will happen on any imports.
