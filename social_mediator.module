@@ -14,6 +14,7 @@ function social_mediator_menu() {
     'page callback' => 'drupal_get_form',
     'page arguments' => array('_social_mediator_admin_page'),
     'access callback' => TRUE,
+    'type' => MENU_NORMAL_ITEM,
   );
 
   $items['admin/social/importall'] = array (
@@ -27,41 +28,36 @@ function social_mediator_menu() {
 // set up global social_mediator permissions.
 
 
-function _social_mediator_admin_page() {
+function _social_mediator_admin_page($form, &$form_state) {
   $content = array('Here is the admin landing page for the global social mediator.');
-  $output = '';
-  foreach($content as $c) {
-    $output .= '<p>' . $c . '</p>';
-  }
-  return $output;
 
- // $form = array();
+  $form = array();
 
- //  $form['consumer_key'] = array(
- //    '#type' => 'text',
- //    '#title' => t('Consumer Key'),
- //    '#description' => t('Enter your Consumer Key'),
- //  );
+  $form['consumer_key'] = array(
+    '#type' => 'textfield',
+    '#title' => 'Consumer Key',
+    '#description' => t('Enter your Consumer Key'),
+  );
 
- //  $form['consumer_secret'] = array(
- //    '#type' => 'text',
- //    '#title' => t('Secret Key'),
- //    '#description' => t('Enter your Secret Key'),
- //  );
+  $form['consumer_secret'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Secret Key'),
+    '#description' => t('Enter your Secret Key'),
+  );
 
- // $form['oauth_access_token'] = array(
- //    '#type' => 'text',
- //    '#title' => t('OAuth Access Token'),
- //    '#description' => t('Enter your OAuth Access Token'),
- //  );
+ $form['oauth_access_token'] = array(
+    '#type' => 'textfield',
+    '#title' => t('OAuth Access Token'),
+    '#description' => t('Enter your OAuth Access Token'),
+  );
 
- //  $form['oauth_access_token_secret'] = array(
- //    '#type' => 'text',
- //    '#title' => t('OAuth Access Token'),
- //    '#description' => t('Enter your OAuth Access Secret Token'),
- //  );
+  $form['oauth_access_token_secret'] = array(
+    '#type' => 'textfield',
+    '#title' => t('OAuth Access Token'),
+    '#description' => t('Enter your OAuth Access Secret Token'),
+  );
 
-  //return system_settings_form($form);
+  return system_settings_form($form);
 }
 
 // need _function to handle import. This will happen on any imports.
