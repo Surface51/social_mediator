@@ -7,38 +7,69 @@ function social_mediator_twitter_menu()
 {
   $menu['admin/social/twitter'] = array
   (
-    'title' => 'Social Mediator - Twitter',
-    'page callback' => '_social_mediator_twitter_admin_page',
+    'title' => 'Twitter Settings',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('_social_mediator_twitter_admin_page'),
     'access callback' => TRUE,
+    'type' => MENU_LOCAL_TASK,
   );
 
   return $menu;
 }
 
 // need a tab in the social_mediator subtheme for twitter. 
-function _social_mediator_twitter_admin_page() {
-  $content = array('Here is the twitter landing page.');
+function _social_mediator_twitter_admin_page($form, &$form_state) {
+  $content = array('Here is the admin landing page for the global social mediator.');
 
-  $output = '';
-  return $output;
+  $form = array();
+
+ $form['sm_oauth_access_token'] = array(
+    '#type' => 'textfield',
+    '#title' => t('OAuth Access Token'),
+    '#description' => t('Enter your OAuth Access Token'),
+    '#default_value' => variable_get("sm_oauth_access_token", "")
+  );
+
+  $form['sm_oauth_access_token_secret'] = array(
+    '#type' => 'textfield',
+    '#title' => t('OAuth Access Token Secret'),
+    '#description' => t('Enter your OAuth Access Secret Token'),
+    '#default_value' => variable_get("sm_oauth_access_token_secret", "")
+  );
+
+  $form['sm_twitter_consumer_key'] = array(
+    '#type' => 'textfield',
+    '#title' => 'Consumer Key',
+    '#description' => t('Enter your Consumer Key'),
+    '#default_value' => variable_get("sm_twitter_consumer_key", "")
+  );
+
+  $form['sm_twitter_consumer_secret'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Secret Key'),
+    '#description' => t('Enter your Secret Key'),
+    '#default_value' => variable_get("sm_twitter_consumer_secret", "")
+ );
+
+  return system_settings_form($form);
 }
-
 
 // need _function to handle twitter import.
 // since it's using a hook of the global module, just keep twitter important stuff.
 function social_mediator_twitter_social_mediator_import($content) {
-  $content[] = 'Twitter submodule activated.';
-  $content[] = "Importing Tweets";
+	$content[] = 'Twitter submodule activated.';
+	$content[] = "Importing Tweets";
 
-  require_once ('class/TwitterAPIExchange.php');
+	require_once ('class/TwitterAPIExchange.php');
 
 	/** Set access tokens here - see: https://dev.twitter.com/apps/ **/
 	$settings = array(
-	    'oauth_access_token' => "15039702-BMaMXAOFOaxlqjk2Ly0rnSGRDAwTwlNzDaC9TBaqt",
-	    'oauth_access_token_secret' => "P2XFlcj5X2fr1CaPfiQptlQyX3Vo6dKbLjAA2pORm2YIw",
-	    'consumer_key' => "dVuGGKxkYJGHAcbHg5Q6wz12g",
-	    'consumer_secret' => "lWHmdTCXQavywXb2odDJCySG4YuYh9lwaw360uTe8YDm3K4jXA"
+	    'oauth_access_token' => variable_get("sm_oauth_access_token", ""),
+	    'oauth_access_token_secret' => variable_get("sm_oauth_access_token_secret", ""),
+	    'consumer_key' => variable_get("sm_twitter_consumer_key", ""),
+	    'consumer_secret' => variable_get("sm_twitter_consumer_secret", "")
 	);
+
 
 	/** Perform a GET request and echo the response **/
 	/** Note: Set the GET field BEFORE calling buildOauth(); **/
@@ -65,16 +96,14 @@ function social_mediator_twitter_social_mediator_import($content) {
 		}
 		$object['tweet_date'] = date('m/d/Y H:i:s', strtotime($result->created_at));
 
-
-		if (!_social_mediator_twitter_find_node($object['tweet_id'])) {
+		if (_social_mediator_twitter_find_node($object['tweet_id']) != 1) {
 			_social_mediator_twitter_create_node($object);
 			$content[] = "Tweet: " . $object['tweet_content'];
 			$count++;
 		}
 	}
 
-
-  return $content;
+	return $content;
 }
 
 function _social_mediator_twitter_find_node($id) {

@@ -11,14 +11,19 @@ function social_mediator_menu() {
   $items['admin/social'] = array (
     'title' => 'Social Mediator',
     'description' => 'Provide API keys to authenticate with Twitter and Instagram',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('_social_mediator_admin_page'),
+    'page callback' => '_social_mediator_admin_page',
     'access callback' => TRUE,
     'type' => MENU_NORMAL_ITEM,
   );
 
+  $items['admin/social/info'] = array (
+  	'title' => 'Reports',
+    'weight' => -1,
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+
   $items['admin/social/importall'] = array (
-    'title' => 'Social Mediator',
+    'title' => 'Import',
     'page callback' => '_social_mediator_import',
     'access callback' => TRUE,
   );
@@ -28,40 +33,17 @@ function social_mediator_menu() {
 // set up global social_mediator permissions.
 
 
-function _social_mediator_admin_page($form, &$form_state) {
-  $content = array('Here is the admin landing page for the global social mediator.');
+function _social_mediator_admin_page() {
+  $content = array('Here is the admin landing page for the global social mediator. 
+  					There will be a button to force an import.
+  					It should also say the last time there was an import, and what was imported.');
 
-  $form = array();
-
-  $form['sm_twitter_consumer_key'] = array(
-    '#type' => 'textfield',
-    '#title' => 'Consumer Key',
-    '#description' => t('Enter your Consumer Key'),
-    '#default_value' => variable_get("sm_twitter_consumer_key", "")
-  );
-
-  $form['sm_twitter_consumer_secret'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Secret Key'),
-    '#description' => t('Enter your Secret Key'),
-    '#default_value' => variable_get("sm_twitter_consumer_secret", "")
- );
-
- $form['sm_oauth_access_token'] = array(
-    '#type' => 'textfield',
-    '#title' => t('OAuth Access Token'),
-    '#description' => t('Enter your OAuth Access Token'),
-    '#default_value' => variable_get("sm_oauth_access_token", "")
-  );
-
-  $form['sm_oauth_access_token_secret'] = array(
-    '#type' => 'textfield',
-    '#title' => t('OAuth Access Token'),
-    '#description' => t('Enter your OAuth Access Secret Token'),
-    '#default_value' => variable_get("sm_oauth_access_token_secret", "")
-  );
-
-  return system_settings_form($form);
+  $output = '';
+  foreach($content as $c)
+  {
+    $output .= '<p>' . $c . '</p>';
+  }
+  return $output;
 }
 
 // need _function to handle import. This will happen on any imports.
@@ -76,7 +58,7 @@ function _social_mediator_import()
   	$content = array("There are no submodules installed.");
   }
 
-  dsm($content);
+  //dsm($content);
 
   $output = '';
   foreach($content as $c)
