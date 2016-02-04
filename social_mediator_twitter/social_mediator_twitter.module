@@ -125,6 +125,11 @@ function social_mediator_twitter_social_mediator_import($content) {
 	if ($method == "Specified Hashtag(s)") {
 		$url = 'https://api.twitter.com/1.1/search/tweets.json';
 
+		if (variable_get("sm_twitter_hashtag", "") == "") {
+			$content[] = "ERROR: You need to specify at least one hashtag.";
+			return $content;
+		}
+
 		$hashtags = explode(", ", variable_get("sm_twitter_hashtag", ""));
 
 		$hashtag_string = implode($hashtags, "+%23");
@@ -132,6 +137,11 @@ function social_mediator_twitter_social_mediator_import($content) {
 		$getfield = '?q=%23'.$hashtag_string.'&count=10';
 	} else if ($method == "A Twitter User") {
 		$url = 'https://api.twitter.com/1.1/statuses/user_timeline.json';
+
+		if (variable_get("sm_twitter_handle", "") == "") {
+			$content[] = "ERROR: You need to specify a twitter handle.";
+			return $content;
+		}
 
 		$exclude = false;
 		if (variable_get("sm_twitter_exclude_replies", "") == 1) {
