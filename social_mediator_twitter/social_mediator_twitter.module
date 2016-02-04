@@ -23,33 +23,84 @@ function _social_mediator_twitter_admin_page($form, &$form_state) {
 
   $form = array();
 
- $form['sm_oauth_access_token'] = array(
-    '#type' => 'textfield',
-    '#title' => t('OAuth Access Token'),
-    '#description' => t('Enter your OAuth Access Token'),
-    '#default_value' => variable_get("sm_oauth_access_token", "")
-  );
+  // pull tweets from a specific user
+  // exclude replies?
 
-  $form['sm_oauth_access_token_secret'] = array(
-    '#type' => 'textfield',
-    '#title' => t('OAuth Access Token Secret'),
-    '#description' => t('Enter your OAuth Access Secret Token'),
-    '#default_value' => variable_get("sm_oauth_access_token_secret", "")
-  );
+  	$form['sm_twitter_method'] = array(
+		'#type' => 'radios',
+  		'#options' => drupal_map_assoc(array(t('A Twitter User'), t('Specified Hashtag(s)'))),
+  		'#title' => t('Pull all tweets from '),
+		'#default_value' => variable_get("sm_twitter_method", ""),
+		'#required' => TRUE,
+	);
 
-  $form['sm_twitter_consumer_key'] = array(
-    '#type' => 'textfield',
-    '#title' => 'Consumer Key',
-    '#description' => t('Enter your Consumer Key'),
-    '#default_value' => variable_get("sm_twitter_consumer_key", "")
-  );
+	$form['sm_api_user'] = array(
+		'#type' => 'fieldset',
+		'#title' => t('A Twitter User'),
+	);
 
-  $form['sm_twitter_consumer_secret'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Secret Key'),
-    '#description' => t('Enter your Secret Key'),
-    '#default_value' => variable_get("sm_twitter_consumer_secret", "")
- );
+	$form['sm_api_user']['sm_twitter_handle'] = array(
+		'#type' => 'textfield',
+		'#title' => t('Username'),
+		'#description' => t('The handle of the twitter user.'),
+		'#default_value' => variable_get("sm_twitter_handle", "")
+	);
+
+	$form['sm_api_user']['sm_twitter_exclude_replies'] = array(
+		'#type' => 'checkbox',
+		'#title' => t('Exclude Replies'),
+		'#description' => t('Do not import this user\'s replies to tweets.'),
+		'#default_value' => variable_get("sm_twitter_exclude_replies", "")
+	);
+
+	$form['sm_api_hashtag'] = array(
+		'#type' => 'fieldset',
+		'#title' => t('A Twitter User'),
+	);
+
+	$form['sm_api_hashtag']['sm_twitter_hashtag'] = array(
+		'#type' => 'textfield',
+		'#title' => t('Hashtag(s)'),
+		'#description' => t('Import all tweets that use these specified hashtags. Specifiy multiple hashtags by using a comma. Do not include the #.'),
+		'#default_value' => variable_get("sm_twitter_hashtag", "")
+	);
+
+	$form['sm_api_details'] = array(
+		'#type' => 'fieldset',
+		'#title' => t('Twitter API details'),
+	);
+
+	$form['sm_api_details']['sm_oauth_access_token'] = array(
+		'#type' => 'textfield',
+		'#title' => t('OAuth Access Token'),
+		'#description' => t('Enter your OAuth Access Token'),
+		'#default_value' => variable_get("sm_oauth_access_token", ""),
+		 '#required' => TRUE,
+	);
+
+	$form['sm_api_details']['sm_oauth_access_token_secret'] = array(
+		'#type' => 'textfield',
+		'#title' => t('OAuth Access Token Secret'),
+		'#description' => t('Enter your OAuth Access Secret Token'),
+		'#default_value' => variable_get("sm_oauth_access_token_secret", ""),
+		 '#required' => TRUE,
+	);
+
+	$form['sm_api_details']['sm_twitter_consumer_key'] = array(
+		'#type' => 'textfield',
+		'#title' => 'Consumer Key',
+		'#description' => t('Enter your Consumer Key'),
+		'#default_value' => variable_get("sm_twitter_consumer_key", ""),
+		 '#required' => TRUE,
+	);
+
+	$form['sm_api_details']['sm_twitter_consumer_secret'] = array(
+		'#type' => 'textfield',
+		'#title' => t('Secret Key'),
+		'#description' => t('Enter your Secret Key'),
+		'#default_value' => variable_get("sm_twitter_consumer_secret", ""),
+		 '#required' => TRUE,
+	);
 
   return system_settings_form($form);
 }
@@ -57,8 +108,7 @@ function _social_mediator_twitter_admin_page($form, &$form_state) {
 // need _function to handle twitter import.
 // since it's using a hook of the global module, just keep twitter important stuff.
 function social_mediator_twitter_social_mediator_import($content) {
-	$content[] = 'Twitter submodule activated.';
-	$content[] = "Importing Tweets";
+	$content[] = "<h3>Importing Tweets</h3>";
 
 	require_once ('class/TwitterAPIExchange.php');
 
@@ -70,11 +120,29 @@ function social_mediator_twitter_social_mediator_import($content) {
 	    'consumer_secret' => variable_get("sm_twitter_consumer_secret", "")
 	);
 
+	$method = variable_get("sm_twitter_method", "");
 
-	/** Perform a GET request and echo the response **/
-	/** Note: Set the GET field BEFORE calling buildOauth(); **/
-	$url = 'https://api.twitter.com/1.1/statuses/user_timeline.json';
-	$getfield = '?screen_name=goodthingz&count=10&exclude_replies=true';
+	if ($method == "Specified Hashtag(s)") {
+		$url = 'https://api.twitter.com/1.1/search/tweets.json';
+
+		$hashtags = explode(", ", variable_get("sm_twitter_hashtag", ""));
+
+		$hashtag_string = implode($hashtags, "+%23");
+
+		$getfield = '?q=%23'.$hashtag_string.'&count=10';
+	} else if ($method == "A Twitter User") {
+		$url = 'https://api.twitter.com/1.1/statuses/user_timeline.json';
+
+		$exclude = false;
+		if (variable_get("sm_twitter_exclude_replies", "") == 1) {
+			$exclude = true;
+		}
+
+		$getfield = '?screen_name='.variable_get("sm_twitter_handle", "").'&count=10&exclude_replies='.$exclude;
+	} else {
+		$content[] = "Social Mediator Twitter needs to be configured.";
+	}
+
 	$requestMethod = 'GET';
 	$twitter = new TwitterAPIExchange($settings);
 	$results = $twitter->setGetfield($getfield)
@@ -82,6 +150,10 @@ function social_mediator_twitter_social_mediator_import($content) {
 	             ->performRequest();
 
 	$results = json_decode($results);
+
+	if ($method == "Specified Hashtag(s)") {
+		$results = $results->statuses;
+	}
 
 	$count = 0;
 
@@ -98,9 +170,15 @@ function social_mediator_twitter_social_mediator_import($content) {
 
 		if (_social_mediator_twitter_find_node($object['tweet_id']) != 1) {
 			_social_mediator_twitter_create_node($object);
-			$content[] = "Tweet: " . $object['tweet_content'];
+			$content[] = "<strong>Tweet: </strong>" . _social_mediator_removeEmoji($object['tweet_content']);
 			$count++;
 		}
+	}
+
+	if ($count == 0) {
+		$content[] = "Tweets are up-to-date.";
+	} else {
+		$content[] = "Imported ".$count." tweets.";
 	}
 
 	return $content;
@@ -129,15 +207,17 @@ function _social_mediator_twitter_create_node($object) {
 	$node->type = 'sm_tweet';
 	node_object_prepare($node);
 
-	$node->title = $object['tweet_content'];
+	$node->title = _social_mediator_removeEmoji($object['tweet_content']);
 
 	//$node->tweet_date['und'][0]['value'] = date('Y-m-d H:i:s', strtotime($object['tweet_date']));
 	$node->twitter_user['und'][0]['value'] = $object['twitter_user'];
-	$node->tweet_content['und'][0]['value'] = $object['tweet_content'];
+	$node->tweet_content['und'][0]['value'] = _social_mediator_removeEmoji($object['tweet_content']);
 	$node->tweet_id['und'][0]['value'] = $object['tweet_id'];
 
 	node_save($node);
 }
+
+
 
 
 // need hook_cron so that imports happen on cron.
